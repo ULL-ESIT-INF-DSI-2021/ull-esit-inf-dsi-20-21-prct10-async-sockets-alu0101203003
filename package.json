@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "start": "tsc-watch --onSuccess \"node dist/modificacion/server.js\"",
+    "start": "tsc-watch --onSuccess \"node dist/aplicacion/app.js\"",
+    "client": "tsc-watch --onSuccess \"node dist/aplicacion/Cliente.js\"",
+    "server": "tsc-watch --onSuccess \"node dist/aplicacion/Servidor.js\"",
     "doc": "typedoc",
     "coverage": "nyc npm test && nyc report --reporter=lcov"
   },
