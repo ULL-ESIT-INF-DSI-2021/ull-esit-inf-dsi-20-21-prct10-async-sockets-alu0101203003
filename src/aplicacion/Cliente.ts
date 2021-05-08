@@ -74,7 +74,7 @@ client.on('data', (chunk) => {
       
       client.write(JSON.stringify(req), (err) => {
         if (err) {
-          console.log(`Request could not be made: ${err.message}`);
+          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
         } else {
           client.end();
         }
@@ -134,7 +134,7 @@ client.on('data', (chunk) => {
       
       client.write(JSON.stringify(req), (err) => {
         if (err) {
-          console.log(`Request could not be made: ${err.message}`);
+          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
         } else {
           client.end();
         }
@@ -176,7 +176,85 @@ client.on('data', (chunk) => {
       
       client.write(JSON.stringify(req), (err) => {
         if (err) {
-          console.log(`Request could not be made: ${err.message}`);
+          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
+        } else {
+          client.end();
+        }
+      });
+      
+    } else {
+      console.log(chalk.red("Error. Comando mal especificado"));
+    }
+  },
+});
+
+/**
+ * Comando read.
+ * Lee una nota al directorio del usuario
+ */
+ yargs.command({
+  command: 'read',
+  describe: 'lee una nota',
+  builder: {
+    usuario: {
+      describe: 'Nombre del usuario',
+      demandOption: true,
+      type: 'string',
+    },
+    titulo: {
+      describe: 'Titulo de la nota',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    if (typeof argv.usuario === 'string' && typeof argv.titulo === 'string') {
+      
+      const req: RequestType = {
+        type: 'read',
+        user: argv.usuario,
+        title: argv.titulo
+      };
+      
+      client.write(JSON.stringify(req), (err) => {
+        if (err) {
+          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
+        } else {
+          client.end();
+        }
+      });
+      
+    } else {
+      console.log(chalk.red("Error. Comando mal especificado"));
+    }
+  },
+});
+
+/**
+ * Comando list.
+ * Lista las notas del directorio del usuario
+ */
+ yargs.command({
+  command: 'list',
+  describe: 'lista las notas del usuario',
+  builder: {
+    usuario: {
+      describe: 'Nombre del usuario',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    if (typeof argv.usuario === 'string') {
+      
+      const req: RequestType = {
+        type: 'list',
+        user: argv.usuario,
+      };
+      
+      client.write(JSON.stringify(req), (err) => {
+        if (err) {
+          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
         } else {
           client.end();
         }

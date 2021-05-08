@@ -36,6 +36,18 @@ const server = createServer({allowHalfOpen: true}, (connection) => {
       usuario.eliminarNota(request.title);
       connection.end();
     }
+
+    if (request.type == 'read'){
+      usuario.leerNota(request.title);
+      connection.end();
+    }
+
+    if (request.type == 'list'){
+      usuario.listarNotas();
+      connection.end();
+    }
+
+
   });
     /*
     const cmd = spawn(request.command, request.arguments);
