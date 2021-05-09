@@ -1,11 +1,6 @@
-import * as yargs from 'yargs';
 import { Usuario } from '../aplicacion/usuario';
 const chalk=require('chalk');
-import {EventEmitter} from 'events';
-import * as net from 'net';
 import {createServer} from 'net';
-import {spawn} from 'child_process';
-import {connect} from 'net';
 import {RequestType, ResponseType} from './tipos';
 import { MessageEventEmitterServer } from './MessageEventEmitterServer';
 
@@ -26,7 +21,6 @@ const server = createServer({allowHalfOpen: true}, (connection) => {
     }
   
     if (mensaje.type == 'add'){
-      console.log(mensaje)
       var succ = usuario.añadirNota(mensaje.title,mensaje.body,mensaje.color);
       resp = {
         type: 'add',

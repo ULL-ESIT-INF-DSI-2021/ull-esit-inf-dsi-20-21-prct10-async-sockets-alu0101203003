@@ -1,5 +1,11 @@
 import {EventEmitter} from 'events';
 
+/**
+ * Clase MessageEventEmitterServer.
+ * Permite emitir al servidor la petición del cliente
+ * a través de la coneccion establecida.
+ * @param connection coneccion establecida
+ */
 export class MessageEventEmitterServer extends EventEmitter {
     constructor(connection: EventEmitter) {
       super();

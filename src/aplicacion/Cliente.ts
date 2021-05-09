@@ -1,10 +1,5 @@
 import * as yargs from 'yargs';
-import { Usuario } from '../aplicacion/usuario';
 const chalk=require('chalk');
-import {EventEmitter} from 'events';
-import * as net from 'net';
-import {createServer} from 'net';
-import {spawn} from 'child_process';
 import {connect} from 'net';
 import {RequestType, ResponseType} from './tipos';
 import {MessageEventEmitterClient } from './MessageEventEmitterClient';
