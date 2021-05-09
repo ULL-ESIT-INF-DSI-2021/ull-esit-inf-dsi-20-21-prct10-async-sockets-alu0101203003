@@ -7,104 +7,93 @@ import {createServer} from 'net';
 import {spawn} from 'child_process';
 import {connect} from 'net';
 import {RequestType, ResponseType} from './tipos';
+import { MessageEventEmitterServer } from './MessageEventEmitterServer';
 
 const server = createServer({allowHalfOpen: true}, (connection) => {
-  console.log('Client connected');
+  console.log('Cliente conectado');
 
-  let data = '';
-  connection.on('data', (chunk) => {
-    data += chunk;
-  });
+  var emit = new MessageEventEmitterServer(connection);
+  emit.on('request', (mensaje) => {
+    console.log('Petición del cliente recibida');
 
-  connection.on('end', () => {
-    console.log('Request received from client');
+    
+    var usuario = new Usuario(mensaje.user);
 
-    const request = JSON.parse(data);
-    var usuario = new Usuario(request.user);
-
-    if (request.type == 'add'){
-      usuario.añadirNota(request.title,request.body,request.color);
-      connection.end();
+    var resp :ResponseType = {
+      type: 'add',
+      success: false,
+      mensaje: ""
     }
-
-    if (request.type == 'update'){
-      usuario.modificarNota(request.title,request.titleMod,request.bodyMod,request.colorMod);
-      connection.end();
-    }
-
-    if (request.type == 'remove'){
-      usuario.eliminarNota(request.title);
-      connection.end();
-    }
-
-    if (request.type == 'read'){
-      usuario.leerNota(request.title);
-      connection.end();
-    }
-
-    if (request.type == 'list'){
-      usuario.listarNotas();
-      connection.end();
-    }
-
-
-  });
-    /*
-    const cmd = spawn(request.command, request.arguments);
-
-    let cmdOutput = '';
-    cmd.stdout.on('data', (chunk) => {
-      cmdOutput += chunk;
-    });
-
-    let cmdError = '';
-    cmd.stderr.on('data', (chunk) => {
-      cmdError += chunk;
-    });
-
-    cmd.on('close', (code) => {
-      let response: ResponseType;
-      if (code! < 0) {
-        response = {
-          error: `Command ${request.command} does not exist`,
-        };
-      } else if (code! > 0) {
-        response = {
-          error: cmdError,
-        };
-      } else {
-        response = {
-          output: cmdOutput,
-        };
+  
+    if (mensaje.type == 'add'){
+      console.log(mensaje)
+      var succ = usuario.añadirNota(mensaje.title,mensaje.body,mensaje.color);
+      resp = {
+        type: 'add',
+        success: succ.success,
+        mensaje: succ.mensaje
       }
-      console.log('Response sent to client');
-      connection.write(JSON.stringify(response), (err) => {
-        if (err) {
-          console.log(`Response could not be sent back: ${err.message}`);
-        } else {
-          connection.end();
-        }
-      });
-    });
+    }
 
-    cmd.on('error', (err) => {
+    if (mensaje.type == 'update'){
+      var succ = usuario.modificarNota(mensaje.title,mensaje.titleMod,mensaje.bodyMod,mensaje.colorMod);
+      resp = {
+        type: 'update',
+        success: succ.success,
+        mensaje: succ.mensaje
+      }
+    }
+
+    if (mensaje.type == 'remove'){
+      var succ = usuario.eliminarNota(mensaje.title);
+      resp = {
+        type: 'remove',
+        success: succ.success,
+        mensaje: succ.mensaje
+      }
+    }
+
+    if (mensaje.type == 'read'){
+      var succ = usuario.leerNota(mensaje.title);
+      resp = {
+        type: 'read',
+        success: succ.success,
+        mensaje: succ.mensaje
+      }
+    }
+
+    if (mensaje.type == 'list'){
+      var succ = usuario.listarNotas();
+      resp = {
+        type: 'list',
+        success: succ.success,
+        mensaje: succ.mensaje
+      }
+    }
+
+    connection.write(JSON.stringify(resp), (err) => {
       if (err) {
-        console.log(`Command could not be run: ${err.message}`);
+        console.log(chalk.red(`Error. No se pudo realizar la petición: ${err.message}`));
+      } else {
+        console.log(chalk.green(`Petición del cliente completada correctamente`));
+        connection.end();
       }
     });
-  */
+    
+  });
+
 
   connection.on('error', (err) => {
     if (err) {
-      console.log(`Connection could not be established: ${err.message}`);
+      console.log(chalk.red(`Error.No se pudo establecer conexión: ${err.message}`));
     }
   });
 
   connection.on('close', () => {
-    console.log('Client disconnected');
+    console.log('Cliente desconectado');
   });
 });
 
   server.listen(60300, () => {
-    console.log('Waiting for clients to connect');
+    console.log('Esperando conexión del cliente');
 });

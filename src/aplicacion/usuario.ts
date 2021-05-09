@@ -34,14 +34,22 @@ export class Usuario {
      * @param color color de la nota
      */ 
     public añadirNota(titulo :string, cuerpo :string, color :string){
+        var salida = {
+            success: false,
+            mensaje: ""
+        }
         if (this.existeNota(this.nombre,titulo)){
-            console.log(chalk.red("Error. La nota ya existe"));
+            return salida;
         } else {
             var nota = new Nota(titulo,cuerpo,color);
             var notaFormateada = nota.formatear();
             fs.writeFile(`src/aplicacion/notas/${this.nombre}/${titulo}.json`, notaFormateada, () => {
-                console.log(chalk.green('Nota añadida con éxito'));
+                salida = {
+                    success: true,
+                    mensaje: chalk.green('Nota añadida con éxito')
+                }
             });
+            return salida;
         }
     }
 
@@ -53,8 +61,12 @@ export class Usuario {
      * @param color color actual de la nota
      */ 
     public modificarNota(titulo :string, tituloMod :string, cuerpoMod :string, colorMod :string){
+        var salida = {
+            success: false,
+            mensaje: ""
+        }
         if (!this.existeNota(this.nombre,titulo)){
-            console.log(chalk.red("Error. La nota no existe"));
+            return salida;
         } else {
             var nota = fs.readFileSync(`src/aplicacion/notas/${this.nombre}/${titulo}.json`);
             var notaParseada = JSON.parse(nota.toString());
@@ -74,8 +86,13 @@ export class Usuario {
             }
 
             fs.writeFile(`src/aplicacion/notas/${this.nombre}/${notaMod.getTitulo()}.json`, notaMod.formatear(), () => {
-                console.log(chalk.green('Nota modificada con éxito'));
+                salida = {
+                    success: true,
+                    mensaje: chalk.green('Nota modificada con éxito')
+                }
             });
+
+            return salida;
         }
     }
 
@@ -85,12 +102,21 @@ export class Usuario {
      * @param titulo titulo de la nota
      */ 
     public eliminarNota(titulo :string){
+        var salida = {
+            success: false,
+            mensaje: ""
+        }
         if (!this.existeNota(this.nombre,titulo)){
-            console.log(chalk.red("Error. La nota no existe"));
+            return salida;
         } else {
             fs.rm(`src/aplicacion/notas/${this.nombre}/${titulo}.json`, () => {
-                console.log(chalk.green('Nota eliminada con éxito'));
+                salida = {
+                    success: true,
+                    mensaje: chalk.green('Nota eliminada con éxito')
+                }
             });
+            
+            return salida;
         }
     }
 
@@ -127,14 +153,26 @@ export class Usuario {
      * Permite mostrar todas las notas del directorio del usuario
      */ 
     public listarNotas(){
-        console.log(`Notas del usuario ${this.nombre} :`);
-
-        fs.readdirSync(`src/aplicacion/notas/${this.nombre}`).forEach((item) => {
-            var nota = fs.readFileSync(`src/aplicacion/notas/${this.nombre}/${item}`);
-            var notaParseada = JSON.parse(nota.toString());
-            var titulosColoreados :string = this.colorear(notaParseada.titulo,notaParseada.color);
-            console.log(titulosColoreados)
-        });
+        var salida = {
+            success: false,
+            mensaje: ""
+        }
+        if (!this.existeUsuario(this.nombre)){
+            return salida;
+        } else {
+            var titulosColoreados :string = `Notas del usuario ${this.nombre} : \n`
+            fs.readdirSync(`src/aplicacion/notas/${this.nombre}`).forEach((item) => {
+                var nota = fs.readFileSync(`src/aplicacion/notas/${this.nombre}/${item}`);
+                var notaParseada = JSON.parse(nota.toString());
+                titulosColoreados = titulosColoreados + `\n` + this.colorear(notaParseada.titulo,notaParseada.color);
+                
+                salida = {
+                    success: true,
+                    mensaje: titulosColoreados
+                }
+            });
+            return salida;
+        }
     }
 
     /**
@@ -143,13 +181,22 @@ export class Usuario {
      * @param titulo titulo de la nota
      */ 
      public leerNota(titulo :string){
+        var salida = {
+            success: false,
+            mensaje: ""
+        }
         if (!this.existeNota(this.nombre,titulo)){
-            console.log(chalk.red("Error. La nota no existe"));
+            return salida;
         } else {
             var nota = fs.readFileSync(`src/aplicacion/notas/${this.nombre}/${titulo}.json`);
             var notaParseada = JSON.parse(nota.toString());
             var notaColoreada :string = this.colorear(`Título:\n${notaParseada.titulo}\n\nCuerpo:\n${notaParseada.cuerpo}`,notaParseada.color);
-            console.log(notaColoreada)
+            
+            salida = {
+                success: true,
+                mensaje: notaColoreada
+            }
+            return salida;
         }
     }
     

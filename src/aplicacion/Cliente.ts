@@ -7,30 +7,57 @@ import {createServer} from 'net';
 import {spawn} from 'child_process';
 import {connect} from 'net';
 import {RequestType, ResponseType} from './tipos';
+import {MessageEventEmitterClient } from './MessageEventEmitterClient';
 
 
 const client = connect({port: 60300});
 
-let data = '';
-client.on('data', (chunk) => {
-  data += chunk;
-}); 
+var emit = new MessageEventEmitterClient (client);
+  emit.on('respuesta', (respuesta) => {
+    console.log('Request received from client');
 
-  
-/*
-  client.on('end', () => {
-    const res: ResponseType = JSON.parse(data);
-    if (res.error) {
-      console.log(res.error);
-    } else if (res.output) {
-      console.log(res.output);
+
+    if (respuesta.type == 'add'){
+      if (respuesta.success == true){
+        console.log(respuesta.mensaje)
+      } else {
+        console.log(chalk.red("Error. La nota ya existe"));
+      }
     }
-  });
 
-  client.on('error', (err) => {
-    console.log(`Connection could not be established: ${err.message}`);
-  });
-*/
+    if (respuesta.type == 'update'){
+      if (respuesta.success == true){
+        console.log(respuesta.mensaje)
+      } else {
+        console.log(chalk.red("Error. La nota no existe"));
+      }
+    }
+
+    if (respuesta.type == 'remove'){
+      if (respuesta.success == true){
+        console.log(respuesta.mensaje)
+      } else {
+        console.log(chalk.red("Error. La nota no existe"));
+      }
+    }
+
+    if (respuesta.type == 'read'){
+      if (respuesta.success == true){
+        console.log(respuesta.mensaje)
+      } else {
+        console.log(chalk.red("Error. La nota no existe"));
+      }
+    }
+
+    if (respuesta.type == 'list'){
+      if (respuesta.success == true){
+        console.log(respuesta.mensaje)
+      } else {
+        console.log(chalk.red("Error. El usuario no existe"));
+      }
+    }
+
+});
 
 /**
  * Comando add.
@@ -72,11 +99,9 @@ client.on('data', (chunk) => {
         color: argv.color,
       };
       
-      client.write(JSON.stringify(req), (err) => {
+      client.write(JSON.stringify(req) + '\n', (err) => {
         if (err) {
-          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
-        } else {
-          client.end();
+          console.log(chalk.red(`Error. No se pudo hacer la peticion al servidor: ${err.message}`));
         }
       });
 
@@ -132,9 +157,9 @@ client.on('data', (chunk) => {
         colorMod: argv.colorMod,
       };
       
-      client.write(JSON.stringify(req), (err) => {
+      client.write(JSON.stringify(req) + '\n', (err) => {
         if (err) {
-          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
+          console.log(chalk.red(`Error. No se pudo hacer la peticion al servidor: ${err.message}`));
         } else {
           client.end();
         }
@@ -174,9 +199,9 @@ client.on('data', (chunk) => {
         title: argv.titulo
       };
       
-      client.write(JSON.stringify(req), (err) => {
+      client.write(JSON.stringify(req) + '\n', (err) => {
         if (err) {
-          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
+          console.log(chalk.red(`Error. No se pudo hacer la peticion al servidor: ${err.message}`));
         } else {
           client.end();
         }
@@ -216,9 +241,9 @@ client.on('data', (chunk) => {
         title: argv.titulo
       };
       
-      client.write(JSON.stringify(req), (err) => {
+      client.write(JSON.stringify(req) + '\n', (err) => {
         if (err) {
-          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
+          console.log(chalk.red(`Error. No se pudo hacer la peticion al servidor: ${err.message}`));
         } else {
           client.end();
         }
@@ -252,9 +277,9 @@ client.on('data', (chunk) => {
         user: argv.usuario,
       };
       
-      client.write(JSON.stringify(req), (err) => {
+      client.write(JSON.stringify(req) + '\n', (err) => {
         if (err) {
-          console.log(`Error. No se pudo hacer la peticion al servidor: ${err.message}`);
+          console.log(chalk.red(`Error. No se pudo hacer la peticion al servidor: ${err.message}`));
         } else {
           client.end();
         }

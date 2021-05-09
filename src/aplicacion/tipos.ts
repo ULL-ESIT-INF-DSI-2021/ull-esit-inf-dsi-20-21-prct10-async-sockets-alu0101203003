@@ -14,6 +14,7 @@ export type RequestType = {
   export type ResponseType = {
     type: 'add' | 'update' | 'remove' | 'read' | 'list';
     success: boolean;
-    notes?: Nota[];
+    // cambiado Notas[] por mensaje (ya que mi aplicación no hace uso de un array de notas)
+    mensaje?: string;
   }
   
