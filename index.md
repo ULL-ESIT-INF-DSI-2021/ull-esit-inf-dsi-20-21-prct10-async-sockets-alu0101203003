@@ -166,7 +166,7 @@ var emit = new MessageEventEmitterClient (client);
 
 Un ejemplo de feedback significativo que obtendrá el cliente del servidor se puede comprobar al ejecutar el comando `list` que devuelve como mensaje todas las notas de un usuario con su respectivo color:
 
-<img src="img/1" alt=""/>
+<img src="img/1.PNG" alt=""/>
 
 #### 2.2 Servidor
 
