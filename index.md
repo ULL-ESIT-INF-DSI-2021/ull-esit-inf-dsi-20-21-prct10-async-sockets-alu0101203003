@@ -279,6 +279,8 @@ Como se pude comprobar, las funciones (como `añadirNota`) aportan un valor de r
     }
 ```
 
+Para todas las funciones se declarará una salida cuyo mensaje será modificado por la función arrojando su salida convencional (la que anteriormente se mostraría por pantalla). Este mensaje será el que usará el cliente después de haber manejado esta respuesta para obtener el feedback y mostrarlo por su consola.
+
 
 ### Conclusiones
 
