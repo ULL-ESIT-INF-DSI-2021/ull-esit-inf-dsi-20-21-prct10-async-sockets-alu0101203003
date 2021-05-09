@@ -56,9 +56,121 @@ Un usuario solo puede interactuar con la aplicación de procesamiento de notas d
 
 #### 2.1 Cliente
 
-#### 2.2 Servidor
+Para conectar el cliente tendremos que declararlo como un socket conectado al puerto 60300, que será el que usaremos para escuchar en el servidor:
+
+```ts
+const client = connect({port: 60300});
+```
+
+El cliente se encargará de manejar la entrada de comandos para todos las funciones de la app. Para ello haremos uso de yargs al igual que en la práctica 8. Sin embargo, los manejadores de los comandos cambiarán para poder escribir en la conexión la petición que se le efectuará al servidor. Esta petición será de tipo RequestType y contendrá los atributos obtenidos por comando que serán usados por el servidor después para ejecutar el comando correspondiente.
+
+```ts
+/**
+ * Comando add.
+ * Añade una nota al directorio del usuario
+ */
+ yargs.command({
+  command: 'add',
+  describe: 'Añade una nueva nota',
+  builder: {
+    usuario: {
+      describe: 'Nombre del usuario',
+      demandOption: true,
+      type: 'string',
+    },
+    titulo: {
+      describe: 'Titulo de la nota',
+      demandOption: true,
+      type: 'string',
+    },
+    cuerpo: {
+      describe: 'Cuerpo de la nota',
+      demandOption: true,
+      type: 'string',
+    },
+    color: {
+      describe: 'Color de la nota',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    if (typeof argv.usuario === 'string' && typeof argv.titulo === 'string' && typeof argv.cuerpo === 'string' && typeof argv.color === 'string') {
+      
+      const req: RequestType = {
+        type: 'add',
+        user: argv.usuario,
+        title: argv.titulo,
+        body: argv.cuerpo,
+        color: argv.color,
+      };
+      
+      client.write(JSON.stringify(req) + '\n', (err) => {
+        if (err) {
+          console.log(chalk.red(`Error. No se pudo hacer la peticion al servidor: ${err.message}`));
+        }
+      });
+
+    } else {
+      console.log(chalk.red("Error. Comando mal especificado"));
+    }
+  },
+});
+```
+El servidor manejara esta petición y, como resultado enviará una respuesta. Esta respuesta llegará como un mensaje y, para poderlo manejar correctamente, nos será de gran utilidad crear una subclase de EventEmitter que emita esta respuesta al cliente.
+
+```ts
+/**
+ * Clase MessageEventEmitterClient.
+ * Permite emitir al cliente la respuesta obtenida del servidor
+ * a través de la coneccion establecida.
+ * @param connection coneccion establecida
+ */
+export class MessageEventEmitterClient extends EventEmitter {
+    constructor(connection: EventEmitter) {
+      super();
+  
+        let wholeData = '';
+        connection.on('data', (dataChunk) => {
+            wholeData += dataChunk; 
+        });
+
+        connection.on('end', () => {
+            const respuesta = JSON.parse(wholeData);
+            this.emit('respuesta', respuesta);
+        });
+    }
+}
+```
+
+Gracias a esto el cliente puede recibir feedback de como se ha efectuado la petición y, más importante aún, los datos resultantes de realizarla cuando estos sean necesarios.
+
+Esta clase se encargará de recibir el mensaje por trozos, juntarlo y emitirlo como respuesta en formato JSON.
+
+Esta respuesta será manejada por el cliente, el cual evaluará de que tipo se trata y como actuar en consecuencia. Para cada caso de respuesta a un comando posible se evaluará si la petición fue ejecutada correctamente y, si se da este caso, se mostrará el mensaje obtenido tras ejecutar la función; en el caso contrario, se mostrará el mensaje de error específico para cada petición.
+
+```ts
+var emit = new MessageEventEmitterClient (client);
+  emit.on('respuesta', (respuesta) => {
+    console.log('Request received from client');
+
+
+    if (respuesta.type == 'add'){
+      if (respuesta.success == true){
+        console.log(respuesta.mensaje)
+      } else {
+        console.log(chalk.red("Error. La nota ya existe"));
+      }
+    }
+```
+
+Un ejemplo de feedback significativo que obtendrá el cliente del servidor se puede comprobar al ejecutar el comando `list` que devuelve como mensaje todas las notas de un usuario con su respectivo color:
+
+<img src="img/1" alt=""/>/>
 
 #### 2.2 Servidor
+
+
 
 ### Conclusiones
 
