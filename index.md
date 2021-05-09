@@ -170,6 +170,114 @@ Un ejemplo de feedback significativo que obtendrá el cliente del servidor se pu
 
 #### 2.2 Servidor
 
+El servidor se encargará de manejar la petición solicitada, ejecutar la función correspondiente según esta petición y generar la respuesta correspondiente para enviarla de vuelta al cliente. El servidor se creará con createServer y escuchará en el puerto indicado. Indicará cuando un cliente se conecta y se desconecta:
+
+```ts
+const server = createServer({allowHalfOpen: true}, (connection) => {
+  console.log('Cliente conectado');
+```
+```ts
+connection.on('error', (err) => {
+    if (err) {
+      console.log(chalk.red(`Error.No se pudo establecer conexión: ${err.message}`));
+    }
+  });
+
+  connection.on('close', () => {
+    console.log('Cliente desconectado');
+  });
+});
+
+  server.listen(60300, () => {
+    console.log('Esperando conexión del cliente');
+});
+```
+
+Aquí también ayudará tener una clase que para manejar los mensajes de petición y emitirlos al servidor con el formato correspondiente:
+
+```ts
+/**
+ * Clase MessageEventEmitterServer.
+ * Permite emitir al servidor la petición del cliente
+ * a través de la coneccion establecida.
+ * @param connection coneccion establecida
+ */
+export class MessageEventEmitterServer extends EventEmitter {
+    constructor(connection: EventEmitter) {
+      super();
+  
+      let wholeData = '';
+      connection.on('data', (dataChunk) => {
+        wholeData += dataChunk.toString();
+  
+        let messageLimit = wholeData.indexOf('\n');
+        while (messageLimit !== -1) {
+          const message = wholeData.substring(0, messageLimit);
+          wholeData = wholeData.substring(messageLimit + 1);
+          this.emit('request', JSON.parse(message));
+          messageLimit = wholeData.indexOf('\n');
+        }
+      });
+    }
+  }
+```
+
+Para crear las respuestas usaremos los resultados por las funciones de la clase Usuario (explicada en la [práctica8](https://github.com/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101203003)).
+
+```ts
+var emit = new MessageEventEmitterServer(connection);
+  emit.on('request', (mensaje) => {
+    console.log('Petición del cliente recibida');
+
+    
+    var usuario = new Usuario(mensaje.user);
+
+    var resp :ResponseType = {
+      type: 'add',
+      success: false,
+      mensaje: ""
+    }
+  
+    if (mensaje.type == 'add'){
+      var succ = usuario.añadirNota(mensaje.title,mensaje.body,mensaje.color);
+      resp = {
+        type: 'add',
+        success: succ.success,
+        mensaje: succ.mensaje
+      }
+    }
+```
+
+Como se pude comprobar, las funciones (como `añadirNota`) aportan un valor de retorno que ya no es booleano (pues podemos acceder a varios atributos dentro de él). Esto se debe a que es necesario cambiar las funciones previamente implementadas para que devuelvan una salida compuesta y poder conservar el mensaje correctamente para enviarlo en la respuesta a modo de feedback para el cliente. Veremos como ejemplo la función `listarNotas`:
+
+```ts
+    /**
+     * Función listarNotas.
+     * Permite mostrar todas las notas del directorio del usuario
+     */ 
+    public listarNotas(){
+        var salida = {
+            success: false,
+            mensaje: ""
+        }
+        if (!this.existeUsuario(this.nombre)){
+            return salida;
+        } else {
+            var titulosColoreados :string = `Notas del usuario ${this.nombre} : \n`
+            fs.readdirSync(`src/aplicacion/notas/${this.nombre}`).forEach((item) => {
+                var nota = fs.readFileSync(`src/aplicacion/notas/${this.nombre}/${item}`);
+                var notaParseada = JSON.parse(nota.toString());
+                titulosColoreados = titulosColoreados + `\n` + this.colorear(notaParseada.titulo,notaParseada.color);
+                
+                salida = {
+                    success: true,
+                    mensaje: titulosColoreados
+                }
+            });
+            return salida;
+        }
+    }
+```
 
 
 ### Conclusiones
