@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "start": "tsc-watch --onSuccess \"node dist/aplicacion/app.js\"",
+    "start": "tsc-watch --onSuccess \"node dist/ejercicio17-05/users.js\"",
     "client": "tsc-watch --onSuccess \"node dist/aplicacion/Cliente.js\"",
     "server": "tsc-watch --onSuccess \"node dist/aplicacion/Servidor.js\"",
     "doc": "typedoc",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.17",
     "@types/mocha": "^8.2.2",
+    "@types/mongodb": "^3.6.12",
     "@types/node": "^15.0.1",
     "@types/yargs": "^16.0.1",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
@@ -41,6 +42,7 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "chalk": "^4.1.1"
+    "chalk": "^4.1.1",
+    "mongodb": "^3.6.6"
   }
 }
