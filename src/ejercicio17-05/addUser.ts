@@ -1,3 +1,4 @@
+//ej 17-05: 
 import {MongoClient} from 'mongodb';
 
 const dbURL = 'mongodb://127.0.0.1:27017';
