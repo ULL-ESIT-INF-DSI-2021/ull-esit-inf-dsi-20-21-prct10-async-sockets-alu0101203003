@@ -18,10 +18,10 @@ MongoClient.connect(dbURL, {
   const db = client.db(dbName);
 
   return db.collection<User>('users').insertOne({
-    nombre: "Raul", 
-    apellidos: "Martin", 
+    nombre: "Raul2", 
+    apellidos: "Martin2", 
     edad: 20,
-    email: "alu0101@gmail.com",
+    email: "alu0202@gmail.com",
     contraseña: "raul123",
   });
 }).then((result) => {

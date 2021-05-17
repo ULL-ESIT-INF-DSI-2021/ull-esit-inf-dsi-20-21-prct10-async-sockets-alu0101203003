@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "start": "tsc-watch --onSuccess \"node dist/ejercicio17-05/users.js\"",
+    "start": "tsc-watch --onSuccess \"node dist/ejercicio17-05/addUser.js\"",
+    "addUser": "tsc-watch --onSuccess \"node dist/ejercicio17-05/addUser.js\"",
+    "findUser": "tsc-watch --onSuccess \"node dist/ejercicio17-05/findUser.js\"",
+    "updateUser": "tsc-watch --onSuccess \"node dist/ejercicio17-05/updateUser.js\"",
     "client": "tsc-watch --onSuccess \"node dist/aplicacion/Cliente.js\"",
     "server": "tsc-watch --onSuccess \"node dist/aplicacion/Servidor.js\"",
     "doc": "typedoc",
