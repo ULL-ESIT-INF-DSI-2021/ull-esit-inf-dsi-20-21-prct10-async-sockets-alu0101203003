@@ -1,4 +1,5 @@
 import {MongoClient} from 'mongodb';
+const chalk=require('chalk')
 
 const dbURL = 'mongodb://127.0.0.1:27017';
 const dbName = 'users';
@@ -17,7 +18,7 @@ MongoClient.connect(dbURL, {
 }).then((client) => {
   const db = client.db(dbName);
 
-  return db.collection<User>('users').updateOne({
+  return db.collection<User>('users').updateMany({
     email: "alu0202@gmail.com",
   }, {
     $set: {
@@ -29,7 +30,11 @@ MongoClient.connect(dbURL, {
     },
   });
 }).then((result) => {
-  console.log(result.modifiedCount);
+    if (result.modifiedCount == 1){
+        console.log(chalk.green("\n1 usuario coincidente modificado correctamente\n"))
+    } else {
+        console.log(chalk.green("\n"+ result.modifiedCount + " usuarios coincidentes modificados correctamente\n"))
+    }
 }).catch((error) => {
   console.log(error);
 });

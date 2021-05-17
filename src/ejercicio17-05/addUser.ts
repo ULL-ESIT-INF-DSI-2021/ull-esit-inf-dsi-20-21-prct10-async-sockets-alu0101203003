@@ -1,4 +1,5 @@
 import {MongoClient} from 'mongodb';
+const chalk=require('chalk')
 
 const dbURL = 'mongodb://127.0.0.1:27017';
 const dbName = 'users';
@@ -25,7 +26,8 @@ MongoClient.connect(dbURL, {
     contraseña: "raul123",
   });
 }).then((result) => {
-  console.log(result);
+  console.log(chalk.green("\nUsuario añadido correctamente:\n"))
+  console.log(result.ops);
 }).catch((error) => {
   console.log(error);
 });

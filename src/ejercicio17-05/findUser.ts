@@ -1,4 +1,5 @@
 import {MongoClient} from 'mongodb';
+const chalk=require('chalk')
 
 const dbURL = 'mongodb://127.0.0.1:27017';
 const dbName = 'users';
@@ -21,7 +22,8 @@ MongoClient.connect(dbURL, {
     email: "alu0202@gmail.com",
   });
 }).then((result) => {
-  console.log(result);
+    console.log(chalk.green("\nUsuario coincidente:\n"))
+    console.log(result);
 }).catch((error) => {
   console.log(error);
 });
